@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add custom paper styles here later */
+body {
+  background-color: #f3f4f6; /* Light gray background for contrast against the "paper" */
+}

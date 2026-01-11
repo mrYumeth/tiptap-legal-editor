@@ -3,10 +3,11 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Toolbar from './Toolbar' // Import the toolbar
+import { PageBreakExtension } from '../extensions/PageBreakExtension'
 
 const Editor = () => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, PageBreakExtension,],
     content: `
       <h1>Legal Document Draft</h1>
       <p>This is the start of your legal document. Try using the toolbar above to format this text.</p>

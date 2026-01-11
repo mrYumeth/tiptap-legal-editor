@@ -8,3 +8,28 @@
 body {
   background-color: #f3f4f6; /* Light gray background for contrast against the "paper" */
 }
+
+/* Page Break Simulation */
+.page-break-gap {
+  height: 48px;               /* Visual gap height */
+  background-color: #f3f4f6;  /* Match the body gray background */
+  margin-left: -96px;         /* Pull out to cover the left padding */
+  margin-right: -96px;        /* Pull out to cover the right padding */
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+  width: calc(100% + 192px);  /* Full width including pulled margins */
+  pointer-events: none;       /* Let clicks pass through if needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional: Add "Page X" label in the gap */
+.page-break-gap::after {
+  content: "Page " attr(data-page);
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+  text-transform: uppercase;
+}

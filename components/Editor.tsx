@@ -29,6 +29,7 @@ const Editor = () => {
   return (
     <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100">
       {/* 1. Add Toolbar here */}
+      <div className="toolbar-container sticky top-4 z-50"></div>
       <Toolbar editor={editor} />
       
       {/* 2. The "Paper" Container */}

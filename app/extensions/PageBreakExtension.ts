@@ -18,7 +18,7 @@ export const PageBreakExtension = Extension.create({
             // US Letter (96 DPI): 8.5" x 11" = 816px x 1056px
             // Vertical Margins: 1" top + 1" bottom = 192px
             // Content Height per page = 1056px - 192px = 864px
-            const PAGE_CONTENT_HEIGHT = 864 
+            const PAGE_CONTENT_HEIGHT = 800 
             
             let currentHeight = 0
             let pageNumber = 1

@@ -33,3 +33,53 @@ body {
   font-weight: 500;
   text-transform: uppercase;
 }
+
+@media print {
+  /* 1. Reset the page layout */
+/* NEW: Prevent paragraphs and headings from splitting awkwardly */
+  p, h1, h2, h3, li {
+    break-inside: avoid;
+  }
+  
+  /* Update the page definition to be strict */
+  @page {
+    margin: 0 !important;
+    size: letter;
+  }
+
+  /* 2. Hide all UI elements (Toolbar, Background, etc.) */
+  body, 
+  nav, 
+  button, 
+  .toolbar-container { 
+    visibility: hidden;
+    background-color: white;
+  }
+
+  /* 3. Make the Editor visible and position it for print */
+  .ProseMirror {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 96px !important; /* Force 1-inch margins */
+    overflow: visible !important;
+  }
+
+  /* 4. Ensure our custom page breaks force a real printer page break */
+  .page-break-gap {
+    break-before: page;    /* This is the magic property */
+    height: 0;
+    border: none;
+    margin: 0;
+    visibility: hidden;    /* Hide the gray "Page 2" bar */
+  }
+
+  /* 5. Remove the shadow and border from the paper container */
+  div[class*="shadow-lg"] {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

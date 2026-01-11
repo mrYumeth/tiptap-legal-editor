@@ -8,7 +8,8 @@ import {
   List, 
   ListOrdered, 
   Heading1, 
-  Heading2 
+  Heading2,
+  Printer 
 } from 'lucide-react'
 
 type Props = {
@@ -88,6 +89,17 @@ const Toolbar = ({ editor }: Props) => {
       >
         <ListOrdered size={20} />
       </button>
+
+      <div className="w-[1px] bg-gray-300 mx-1" />
+      
+    {/* PRINT BUTTON */}
+    <button
+        onClick={() => window.print()}
+        className="p-2 rounded text-gray-600 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+        title="Print Document"
+    >
+        <Printer size={20} />
+    </button>
     </div>
   )
 }

@@ -2,17 +2,22 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import Toolbar from './Toolbar' // Import the toolbar
 
 const Editor = () => {
   const editor = useEditor({
     extensions: [StarterKit],
-    content: '<p>Hello world! This is the start of the legal editor.</p>',
+    content: `
+      <h1>Legal Document Draft</h1>
+      <p>This is the start of your legal document. Try using the toolbar above to format this text.</p>
+      <p>We need enough content to test the pagination later, so feel free to copy-paste some long text here.</p>
+    `,
     editorProps: {
       attributes: {
-        class: 'focus:outline-none', 
+        // Add specific prose classes to handle list styling correctly
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none h-full',
       },
     },
-    // 👇 ADD THIS LINE TO FIX THE ERROR
     immediatelyRender: false, 
   })
 
@@ -21,8 +26,23 @@ const Editor = () => {
   }
 
   return (
-    <div className="w-[816px] min-h-[1056px] bg-white shadow-lg border border-gray-200 p-[96px]">
-      <EditorContent editor={editor} />
+    <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100">
+      {/* 1. Add Toolbar here */}
+      <Toolbar editor={editor} />
+      
+      {/* 2. The "Paper" Container */}
+      <div 
+        className="bg-white shadow-lg border border-gray-200 overflow-hidden cursor-text"
+        style={{
+            width: '816px',       // 8.5in
+            minHeight: '1056px',  // 11in
+            padding: '96px',      // 1in margins
+        }}
+        // Focus editor when clicking anywhere on the paper
+        onClick={() => editor.chain().focus().run()}
+      >
+        <EditorContent editor={editor} />
+      </div>
     </div>
   )
 }

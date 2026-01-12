@@ -26,14 +26,24 @@ const Editor = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100">
-      {/* 🟢 FIXED: Toolbar is now INSIDE the container */}
-      <div className="toolbar-container sticky top-4 z-50">
+    // Added print:bg-white to ensure background is clean
+    <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100 print:bg-white print:py-0 print:block">
+      
+      {/* Added print:hidden to hide the toolbar */}
+      <div className="toolbar-container sticky top-4 z-50 print:hidden">
         <Toolbar editor={editor} />
       </div>
       
       <div 
-        className="bg-white shadow-lg border border-gray-200 overflow-hidden cursor-text"
+        // Added print classes to override styles:
+        // print:!w-full -> Overrides the inline width
+        // print:!h-auto -> Allows full height expansion
+        // print:!p-0 -> Removes padding so @page margins take over
+        // print:overflow-visible -> CRITICAL: allows content to flow to next pages
+        // print:border-none print:shadow-none -> Removes UI box styling
+        className="bg-white shadow-lg border border-gray-200 overflow-hidden cursor-text 
+                   print:!w-full print:!h-auto print:!min-h-0 print:!p-0 print:overflow-visible 
+                   print:border-none print:shadow-none print:m-0"
         style={{
             width: '816px',       
             minHeight: '1056px',  

@@ -8,7 +8,7 @@ body {
   background-color: #f3f4f6;
 }
 
-/* 🟢 NEW: Force exact sizing so our JS Math matches the Browser Rendering */
+/* Force exact sizing so our JS Math matches the Browser Rendering */
 @layer base {
   p {
     line-height: 24px !important;
@@ -52,54 +52,34 @@ body {
 
 @media print {
   @page {
-    margin: 0 !important;
-    size: letter !important;
+    margin: 1in;
+    size: letter;
   }
 
-  /* 1. Hide everything by default, but DO NOT collapse the body height */
+  /* Reset body background */
   body {
-    visibility: hidden !important;
     background-color: white !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
-  /* 2. Remove UI elements from the layout completely */
-  nav, button, .toolbar-container {
+  /* Ensure the editor content flows naturally */
+  .ProseMirror {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide the gray page-break markers in print */
+  .page-break-gap {
     display: none !important;
   }
 
-  /* 3. Position the Editor to fill the printed page */
-  .ProseMirror {
-    visibility: visible !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    
-    /* PHYSICAL DIMENSIONS (Fixes Alignment) */
-    width: 8.5in !important;
-    min-height: 11in !important;
-    
-    /* 1-inch Margins */
-    padding: 1in !important;
-    
-    margin: 0 !important;
-    overflow: visible !important;
-    background: white !important;
-    z-index: 9999 !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Hide the gray page-break markers */
-  .page-break-gap {
-    display: none !important; /* Hide them completely in print */
-  }
-  
-  /* Remove Box Styling */
-  div[class*="shadow-lg"] {
-    box-shadow: none !important;
-    border: none !important;
-  }
-  
-  /* Prevent content splitting */
+  /* Prevent awkward splits */
   p, h1, h2, h3, li {
     break-inside: avoid;
   }

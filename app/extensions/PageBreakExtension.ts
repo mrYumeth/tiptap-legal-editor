@@ -14,32 +14,31 @@ export const PageBreakExtension = Extension.create({
             const { doc } = state
             const decorations: Decoration[] = []
             
-            // 🟢 FIX: Reduce height to 750px (approx 9.5 inches of content)
-            // This leaves a large safety buffer at the bottom so text never overflows unexpectedly.
-            const PAGE_CONTENT_HEIGHT = 750 
+            // 1. Exact Content Height (11in - 2in margins = 864px)
+            const PAGE_HEIGHT = 864
             
             let currentHeight = 0
             let pageNumber = 1
 
             doc.descendants((node, pos) => {
               if (node.isBlock) {
-                let estimatedHeight = 0
+                // 2. Calculate Height based on our STRICT CSS rules
+                let nodeHeight = 0
                 
-                // 🟢 FIX: Handle Headings which are much taller
                 if (node.type.name === 'heading') {
                    const level = node.attrs.level
-                   // H1 = ~80px, H2 = ~60px
-                   estimatedHeight = level === 1 ? 85 : (level === 2 ? 65 : 50)
+                   // H1: 40px line-height + 24px margin = 64px
+                   // H2: 32px line-height + 16px margin = 48px
+                   nodeHeight = level === 1 ? 64 : 48 
                 } else {
-                   // Paragraphs
-                   const nodeText = node.textContent
-                   // Assume lines are shorter (70 chars) to be safe
-                   const lines = Math.ceil(nodeText.length / 70) || 1 
-                   estimatedHeight = lines * 24 + 12 
+                   // Paragraph: 24px line-height + 12px margin
+                   // Approx 85 chars per line for US Letter width
+                   const lines = Math.ceil(node.textContent.length / 85) || 1
+                   nodeHeight = lines * 24 + 12
                 }
 
-                if (currentHeight + estimatedHeight > PAGE_CONTENT_HEIGHT) {
-                   // Insert the break
+                // 3. The Break Logic
+                if (currentHeight + nodeHeight > PAGE_HEIGHT) {
                    const breakElement = document.createElement('div')
                    breakElement.className = 'page-break-gap'
                    breakElement.dataset.page = (pageNumber + 1).toString()
@@ -48,10 +47,11 @@ export const PageBreakExtension = Extension.create({
                      Decoration.widget(pos, breakElement, { side: -1 })
                    )
                    
-                   currentHeight = estimatedHeight
+                   // Reset for next page
+                   currentHeight = nodeHeight 
                    pageNumber++
                 } else {
-                   currentHeight += estimatedHeight
+                   currentHeight += nodeHeight
                 }
               }
             })

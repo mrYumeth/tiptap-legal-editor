@@ -4,28 +4,44 @@
 @tailwind components;
 @tailwind utilities;
 
-/* You can add custom paper styles here later */
 body {
-  background-color: #f3f4f6; /* Light gray background for contrast against the "paper" */
+  background-color: #f3f4f6;
 }
 
-/* Page Break Simulation */
+/* 🟢 NEW: Force exact sizing so our JS Math matches the Browser Rendering */
+@layer base {
+  p {
+    line-height: 24px !important;
+    margin-bottom: 12px !important;
+  }
+  h1 {
+    line-height: 40px !important;
+    margin-bottom: 24px !important;
+    margin-top: 0 !important;
+  }
+  h2 {
+    line-height: 32px !important;
+    margin-bottom: 16px !important;
+    margin-top: 0 !important;
+  }
+}
+
+/* Page Break Gap Style */
 .page-break-gap {
-  height: 48px;               /* Visual gap height */
-  background-color: #f3f4f6;  /* Match the body gray background */
-  margin-left: -96px;         /* Pull out to cover the left padding */
-  margin-right: -96px;        /* Pull out to cover the right padding */
+  height: 48px;
+  background-color: #f3f4f6;
+  margin-left: -96px;
+  margin-right: -96px;
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   position: relative;
-  width: calc(100% + 192px);  /* Full width including pulled margins */
-  pointer-events: none;       /* Let clicks pass through if needed */
+  width: calc(100% + 192px);
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Optional: Add "Page X" label in the gap */
 .page-break-gap::after {
   content: "Page " attr(data-page);
   font-size: 12px;
@@ -34,42 +50,50 @@ body {
   text-transform: uppercase;
 }
 
+/* 🟢 PRINT STYLES */
 @media print {
   @page {
-    /* 🟢 FIX: Explicitly set margins to 0. We handle margins with padding. */
     margin: 0 !important;
-    size: letter; 
+    size: letter;
   }
 
-  /* Hide the UI */
+  /* Hide UI */
   body, nav, button, .toolbar-container { 
     visibility: hidden !important;
-    display: none !important; /* Force removal from layout */
+    height: 0 !important;
+    overflow: hidden !important;
   }
 
-  /* Show the Editor */
+  /* Show Editor */
   .ProseMirror {
     visibility: visible !important;
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
+    height: auto !important;
     margin: 0 !important;
-    padding: 96px !important; /* 1 inch padding */
+    padding: 96px !important;
     overflow: visible !important;
+    background: white !important;
+    z-index: 9999 !important;
   }
 
-  /* Handle the Page Break Gap */
   .page-break-gap {
     break-before: page;
-    height: 0px !important;
-    display: block; /* Ensure it's treated as a block for breaking */
-    border: none !important;
+    height: 0 !important;
     margin: 0 !important;
-    visibility: hidden;
+    border: none !important;
+    visibility: hidden !important;
   }
   
-  /* Prevent awkward splits */
+  /* Remove Box Styling */
+  div[class*="shadow-lg"] {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Prevent Splitting */
   p, h1, h2, h3, li {
     break-inside: avoid;
   }

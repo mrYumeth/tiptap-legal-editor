@@ -14,10 +14,12 @@ const Editor = () => {
       <p>We need enough content to test the pagination later, so feel free to copy-paste some long text here.</p>
     `,
     editorProps: {
-      attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none h-full',
-      },
-    },
+          attributes: {
+            // 🔴 REMOVED: lg:prose-lg xl:prose-2xl (These were making the text too big)
+            // 🟢 ADDED: max-w-none (Prevents the prose library from constraining width, since we set width manually)
+            class: 'prose prose-base max-w-none mx-auto focus:outline-none h-full',
+          },
+        },
     immediatelyRender: false, 
   })
 

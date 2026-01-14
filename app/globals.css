@@ -2,27 +2,32 @@
 @plugin "@tailwindcss/typography"; 
 
 body {
-  background-color: #F3F4F6;
+  background-color: #F3F4F6; /* Light gray "Desk" background */
 }
 
-/* Editor Container - The "Paper" */
+/* SCREEN VIEW 
+  Simulates the paper with physical dimensions.
+*/
 .ProseMirror {
-  min-height: 1056px; /* 11 inches */
+  /* 11 inches height minimum */
+  min-height: 1056px; 
   background-color: white;
-  padding: 96px; /* 1 inch margins around the content */
+  
+  /* 1 inch padding @ 96 DPI */
+  padding: 96px; 
+  
   outline: none;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   
+  /* Standard Legal/Academic Typography */
   font-family: 'Times New Roman', Times, serif;
   font-size: 12pt;
   line-height: 1.5;
   color: black;
 }
 
-/* PAGE BREAK WIDGET
-   Visualizes the gap between pages.
-   Total height must be 192px (2 inches) to represent:
-   1 inch bottom margin of Previous Page + 1 inch top margin of Next Page.
+/* PAGE BREAK WIDGET (SCREEN)
+  Visualizes the gap between pages 1 and 2.
 */
 .page-break-indicator {
   display: flex;
@@ -30,25 +35,22 @@ body {
   justify-content: center;
   align-items: center;
   
-  /* Pull outside the 96px padding of the editor */
+  /* Pull outside the editor padding to span full width */
   margin-left: -96px;
   margin-right: -96px;
   width: calc(100% + 192px);
   
-  /* The visible gray gap strip */
+  /* Visual styling of the "Gap" */
   height: 48px; 
-  background-color: #F3F4F6; /* Matches body background (gray) */
-  
-  /* CRITICAL: Spacing to create the "White Margins" illusion.
-     (192px Total Needed - 48px Gray Bar) / 2 = 72px 
-     Since the parent background is white, these margins appear as white space.
-  */
-  margin-top: 72px;    /* Bottom Margin of Page 1 */
-  margin-bottom: 72px; /* Top Margin of Page 2 */
-  
+  background-color: #F3F4F6;
   border-top: 1px solid #E5E7EB;
   border-bottom: 1px solid #E5E7EB;
-  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  
+  /* Spacing to simulate the bottom margin of Page 1 + Top margin of Page 2 
+     (Total 2 inches = 192px. Minus 48px gap = 144px. Divide by 2 = 72px)
+  */
+  margin-top: 72px;
+  margin-bottom: 72px;
   
   cursor: default;
   user-select: none;
@@ -74,41 +76,59 @@ body {
   font-weight: 500;
 }
 
-/* Print Styles - Hides the gap but forces the break */
+/* PRINT / PDF EXPORT STYLES 
+  This ensures the output is standard US Letter.
+*/
 @media print {
+  /* 1. Define the physical paper size and margins */
   @page {
-    margin: 1in;
     size: letter;
+    margin: 1in; /* This enforces 1 inch on ALL corners of EVERY page */
   }
   
   body {
     background: white;
+    margin: 0;
   }
 
+  /* 2. Reset the Editor Container */
   .ProseMirror {
+    /* Remove screen padding/margins so we don't double up with @page */
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
     min-height: auto !important;
+    width: 100% !important;
   }
 
-  /* Make the widget invisible but keep it in DOM to force break */
+  /* 3. Handle the Page Break Widget */
   .page-break-indicator {
+    /* Hide the visual gray bar */
     height: 0;
     margin: 0;
     border: none;
     background: transparent;
-    box-shadow: none;
+    
+    /* CRITICAL: Force the printer to start a new page here */
     break-before: page;
     page-break-before: always;
+    
+    /* Ensure it doesn't take up vertical space */
+    display: block; 
   }
 
   .page-break-line, 
   .page-number-label {
     display: none;
   }
-  
+
+  /* 4. Hide UI Elements */
   .print\:hidden {
     display: none !important;
+  }
+  
+  /* Hide the scrollbar during print */
+  ::-webkit-scrollbar {
+    display: none;
   }
 }

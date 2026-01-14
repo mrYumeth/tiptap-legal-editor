@@ -44,27 +44,27 @@ export const PageBreakExtension = Extension.create({
 
             const decorations: Decoration[] = []
             
-            // US Letter settings
+            // MATH EXPLANATION:
+            // US Letter Height: 11 inches = 1056px (@ 96 DPI)
+            // Top Margin: 1 inch = 96px
+            // Bottom Margin: 1 inch = 96px
+            // Writable Height = 1056 - 96 - 96 = 864px
             const CONTENT_HEIGHT = 864 
             
             let currentHeight = 0
             let pageNumber = 1
 
-            // FIX: Use descendants instead of forEach to traverse nested nodes (lists, blockquotes)
             doc.descendants((node, pos) => {
-              // 1. Skip measuring container blocks (like ul, ol, blockquote) 
-              //    but return true to visit their children.
               if (node.isBlock && !node.isTextblock && !node.isAtom) {
-                return true
+                return true // Visit children of container blocks
               }
 
-              // 2. Only measure "Leaf Blocks" (Paragraphs, Headings, CodeBlocks, Images)
               if (node.isTextblock || node.isAtom) {
                 let nodeHeight = 0
                 
                 try {
                   const domNode = view.nodeDOM(pos) as HTMLElement
-                  if (domNode instanceof HTMLElement) {
+                  if (domNode && domNode instanceof HTMLElement) {
                     const rect = domNode.getBoundingClientRect()
                     nodeHeight = rect.height
                     
@@ -82,7 +82,6 @@ export const PageBreakExtension = Extension.create({
                    nodeHeight = Math.max(24, Math.ceil(textLength / 80) * 24 + 24)
                 }
 
-                // 3. Check overflow
                 if (currentHeight + nodeHeight > CONTENT_HEIGHT) {
                   const breakWidget = document.createElement('div')
                   breakWidget.className = 'page-break-indicator'
@@ -100,17 +99,14 @@ export const PageBreakExtension = Extension.create({
                     })
                   )
                   
-                  // Reset for next page
                   currentHeight = nodeHeight
                   pageNumber++
                 } else {
                   currentHeight += nodeHeight
                 }
                 
-                // Don't descend into the text content of a paragraph
                 return false
               }
-              
               return false
             })
 

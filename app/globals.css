@@ -121,50 +121,77 @@ body {
   text-decoration: line-through;
 }
 
-/* Page Break Visualization */
-.page-break-line {
-  height: 40px;
-  background: linear-gradient(to bottom, 
-    transparent 0%, 
-    transparent 45%, 
-    #cbd5e1 45%, 
-    #cbd5e1 50%,
-    transparent 50%,
-    transparent 55%,
-    #cbd5e1 55%,
-    #cbd5e1 60%,
-    transparent 60%,
-    transparent 100%
-  );
-  margin: 0 -96px;
-  width: calc(100% + 192px);
+/* Page Break Visualization - MS Word Style */
+.page-break-indicator {
   position: relative;
+  user-select: none;
+  pointer-events: none;
+  margin: 24px -96px;
+  width: calc(100% + 192px);
+  height: 1px;
+  z-index: 1;
+}
+
+.page-break-line {
+  position: relative;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-  user-select: none;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    transparent 45%, 
+    #9ca3af 45%, 
+    #9ca3af 47%,
+    transparent 47%,
+    transparent 53%,
+    #9ca3af 53%,
+    #9ca3af 55%,
+    transparent 55%,
+    transparent 100%
+  );
+}
+
+.page-break-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    #6b7280 0px,
+    #6b7280 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  z-index: 0;
 }
 
 .page-number-label {
+  position: relative;
   background: white;
-  border: 2px solid #cbd5e1;
-  border-radius: 16px;
-  padding: 4px 16px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
+  border: 2px solid #9ca3af;
+  border-radius: 12px;
+  padding: 4px 20px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: system-ui, -apple-system, sans-serif;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  z-index: 2;
 }
 
-/* Print Styles */
+/* Print Styles - WYSIWYG Implementation */
 @media print {
+  /* Set page size and margins */
   @page {
-    size: letter;
-    margin: 1in;
+    size: letter; /* US Letter: 8.5" x 11" */
+    margin: 1in; /* 1 inch margins on all sides */
   }
 
   * {
@@ -174,18 +201,32 @@ body {
 
   body {
     background: white !important;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Hide page break decorations */
+  /* Hide page break indicators in print */
+  .page-break-indicator,
   .page-break-line,
   .page-number-label {
     display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
   }
 
-  /* Reset editor container for print */
-  .ProseMirror {
+  /* Hide screen-only container */
+  .screen-only {
+    display: none !important;
+  }
+
+  /* Show and style print container */
+  .print-container {
+    display: block !important;
+  }
+
+  .print-container .ProseMirror {
+    /* No additional padding needed - @page handles margins */
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
@@ -216,5 +257,11 @@ body {
   .ProseMirror ul,
   .ProseMirror ol {
     page-break-inside: auto;
+  }
+
+  /* Force page breaks at our markers (if needed) */
+  .page-break-indicator + * {
+    page-break-before: always;
+    break-before: page;
   }
 }

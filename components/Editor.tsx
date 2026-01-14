@@ -1,3 +1,4 @@
+// components/Editor.tsx
 'use client'
 
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -57,7 +58,7 @@ const Editor = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100 print:bg-white print:py-0">
+    <div className="flex flex-col items-center min-h-screen py-8 bg-gray-100 print:bg-white print:py-0 print:m-0">
       
       {/* Toolbar */}
       <div className="sticky top-4 z-50 mb-6 print:hidden">
@@ -77,18 +78,22 @@ const Editor = () => {
         </div>
       </div>
       
-      {/* Editor Container */}
+      {/* Editor Container - Screen View */}
       <div 
-        className="bg-white shadow-lg border border-gray-200 cursor-text 
-                   p-[96px] 
-                   print:!w-full print:!h-auto print:!min-h-0 print:!p-0 print:overflow-visible 
-                   print:border-none print:shadow-none print:m-0"
+        className="bg-white shadow-lg border border-gray-200 cursor-text screen-only
+                   print:hidden"
         style={{
           width: '816px',       // 8.5" at 96 DPI
           minHeight: '1056px',  // 11" at 96 DPI
+          padding: '96px',      // 1" margins = 96px
         }}
         onClick={() => editor.chain().focus().run()}
       >
+        <EditorContent editor={editor} />
+      </div>
+
+      {/* Print-only Container */}
+      <div className="hidden print:block print-container">
         <EditorContent editor={editor} />
       </div>
       

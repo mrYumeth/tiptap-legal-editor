@@ -28,7 +28,6 @@ const Editor = () => {
     `,
     editorProps: {
       attributes: {
-        // Tailwind typography prose
         class: 'prose prose-sm focus:outline-none max-w-none',
       },
     },
@@ -45,10 +44,7 @@ const Editor = () => {
         <Toolbar editor={editor} />
       </div>
 
-      {/* EDITOR CONTAINER 
-        Fixed width: 8.5 inches = 816px 
-        This ensures WYSIWYG accuracy for US Letter.
-      */}
+      {/* Editor Container - 8.5 inches wide */}
       <div 
         className="w-[816px] bg-white print:w-full print:m-0"
         onClick={() => editor.chain().focus().run()}

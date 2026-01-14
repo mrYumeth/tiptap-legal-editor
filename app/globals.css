@@ -2,49 +2,37 @@
 @plugin "@tailwindcss/typography"; 
 
 body {
-  background-color: #F3F4F6; /* Light gray "Desk" background */
+  background-color: #F3F4F6;
 }
 
-/* SCREEN VIEW: Simulates the paper */
+/* SCREEN EDITOR VIEW */
 .ProseMirror {
-  min-height: 1056px; /* 11 inches @ 96 DPI */
+  min-height: 1056px;
   background-color: white;
-  
-  /* 1 inch padding @ 96 DPI */
-  padding: 96px; 
-  
+  padding: 96px; /* 1 inch padding on screen */
   outline: none;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  
-  /* Standard Legal Typography */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   font-family: 'Times New Roman', Times, serif;
   font-size: 12pt;
   line-height: 1.5;
   color: black;
 }
 
-/* PAGE BREAK INDICATOR (Screen Only) */
+/* PAGE BREAK INDICATOR (Screen) */
 .page-break-indicator {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
-  /* Pull widget outside the editor padding */
   margin-left: -96px;
   margin-right: -96px;
   width: calc(100% + 192px);
-  
-  /* Visual styling */
   height: 48px; 
   background-color: #F3F4F6;
   border-top: 1px solid #E5E7EB;
   border-bottom: 1px solid #E5E7EB;
-  
-  /* Spacing to simulate margins between pages */
   margin-top: 72px;
   margin-bottom: 72px;
-  
   cursor: default;
   user-select: none;
   pointer-events: none;
@@ -69,58 +57,66 @@ body {
   font-weight: 500;
 }
 
-/* PRINT / PDF EXPORT STYLES 
-   This ensures the PDF output matches the screen exactly.
-*/
+/* --- PRINT / PDF FIX --- */
 @media print {
-  /* 1. FORCE US LETTER SIZE & 1 INCH MARGINS */
+  /* 1. Force Browser to 0 Margins (Takes full control) */
   @page {
     size: letter;
-    margin: 1in; /* Standard US Letter Margins */
-  }
-  
-  body {
-    background: white;
-    margin: 0;
+    margin: 0 !important; 
   }
 
-  /* 2. RESET EDITOR CONTAINER 
-     We remove the screen padding because the @page margin above handles it.
-  */
-  .ProseMirror {
-    padding: 0 !important;
+  body {
     margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* 2. Set Content Dimensions Manually */
+  .ProseMirror {
+    /* Content Width: 8.5in - 2in margins = 6.5in */
+    width: 6.5in !important; 
+    
+    /* Left Margin: 1 inch */
+    margin-left: 1in !important;
+    /* Right Margin: Remainder (1 inch) handled by width */
+    
+    /* Top Margin for PAGE 1 */
+    padding-top: 1in !important; 
+    
+    /* Reset other spacing */
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
     box-shadow: none !important;
     min-height: auto !important;
-    width: 100% !important;
   }
 
-  /* 3. HANDLE PAGE BREAK WIDGETS */
+  /* 3. Handle Page 2+ Top Margin using the Break Widget */
   .page-break-indicator {
-    /* Hide the visual gray bar */
-    height: 0;
-    margin: 0;
-    border: none;
-    background: transparent;
+    /* Make it a 1-inch tall invisible block */
+    display: block !important;
+    height: 1in !important; 
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
     
-    /* Force a real PDF page break here */
+    /* Force the break before this spacer */
     break-before: page;
     page-break-before: always;
-    
-    display: block; 
   }
 
+  /* Hide the visual lines/text in print */
   .page-break-line, 
   .page-number-label {
-    display: none;
-  }
-
-  /* 4. HIDE UI */
-  .print\:hidden {
     display: none !important;
   }
   
-  /* HIDE SCROLLBARS */
+  .print\:hidden {
+    display: none !important;
+  }
+
   ::-webkit-scrollbar {
     display: none;
   }

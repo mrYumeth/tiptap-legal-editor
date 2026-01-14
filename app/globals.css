@@ -5,12 +5,9 @@ body {
   background-color: #F3F4F6; /* Light gray "Desk" background */
 }
 
-/* SCREEN VIEW 
-  Simulates the paper with physical dimensions.
-*/
+/* SCREEN VIEW: Simulates the paper */
 .ProseMirror {
-  /* 11 inches height minimum */
-  min-height: 1056px; 
+  min-height: 1056px; /* 11 inches @ 96 DPI */
   background-color: white;
   
   /* 1 inch padding @ 96 DPI */
@@ -19,36 +16,32 @@ body {
   outline: none;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   
-  /* Standard Legal/Academic Typography */
+  /* Standard Legal Typography */
   font-family: 'Times New Roman', Times, serif;
   font-size: 12pt;
   line-height: 1.5;
   color: black;
 }
 
-/* PAGE BREAK WIDGET (SCREEN)
-  Visualizes the gap between pages 1 and 2.
-*/
+/* PAGE BREAK INDICATOR (Screen Only) */
 .page-break-indicator {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   
-  /* Pull outside the editor padding to span full width */
+  /* Pull widget outside the editor padding */
   margin-left: -96px;
   margin-right: -96px;
   width: calc(100% + 192px);
   
-  /* Visual styling of the "Gap" */
+  /* Visual styling */
   height: 48px; 
   background-color: #F3F4F6;
   border-top: 1px solid #E5E7EB;
   border-bottom: 1px solid #E5E7EB;
   
-  /* Spacing to simulate the bottom margin of Page 1 + Top margin of Page 2 
-     (Total 2 inches = 192px. Minus 48px gap = 144px. Divide by 2 = 72px)
-  */
+  /* Spacing to simulate margins between pages */
   margin-top: 72px;
   margin-bottom: 72px;
   
@@ -77,13 +70,13 @@ body {
 }
 
 /* PRINT / PDF EXPORT STYLES 
-  This ensures the output is standard US Letter.
+   This ensures the PDF output matches the screen exactly.
 */
 @media print {
-  /* 1. Define the physical paper size and margins */
+  /* 1. FORCE US LETTER SIZE & 1 INCH MARGINS */
   @page {
     size: letter;
-    margin: 1in; /* This enforces 1 inch on ALL corners of EVERY page */
+    margin: 1in; /* Standard US Letter Margins */
   }
   
   body {
@@ -91,9 +84,10 @@ body {
     margin: 0;
   }
 
-  /* 2. Reset the Editor Container */
+  /* 2. RESET EDITOR CONTAINER 
+     We remove the screen padding because the @page margin above handles it.
+  */
   .ProseMirror {
-    /* Remove screen padding/margins so we don't double up with @page */
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
@@ -101,7 +95,7 @@ body {
     width: 100% !important;
   }
 
-  /* 3. Handle the Page Break Widget */
+  /* 3. HANDLE PAGE BREAK WIDGETS */
   .page-break-indicator {
     /* Hide the visual gray bar */
     height: 0;
@@ -109,11 +103,10 @@ body {
     border: none;
     background: transparent;
     
-    /* CRITICAL: Force the printer to start a new page here */
+    /* Force a real PDF page break here */
     break-before: page;
     page-break-before: always;
     
-    /* Ensure it doesn't take up vertical space */
     display: block; 
   }
 
@@ -122,12 +115,12 @@ body {
     display: none;
   }
 
-  /* 4. Hide UI Elements */
+  /* 4. HIDE UI */
   .print\:hidden {
     display: none !important;
   }
   
-  /* Hide the scrollbar during print */
+  /* HIDE SCROLLBARS */
   ::-webkit-scrollbar {
     display: none;
   }

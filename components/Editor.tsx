@@ -9,22 +9,20 @@ const Editor = () => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Standard heading levels
         heading: { levels: [1, 2, 3] },
       }),
       PageBreakExtension,
     ],
     content: `
       <h1>Legal Document Draft</h1>
-      <p>This document demonstrates real-time pagination with exact 1-inch margins.</p>
-      <p>The layout you see here matches the US Letter standard (8.5" x 11").</p>
-      <h2>Instructions</h2>
+      <p>This document demonstrates <strong>WYGIWYS</strong> (What You Get Is What You See) printing.</p>
+      <p>The layout is strictly controlled to ensure US Letter (8.5" x 11") compliance with exactly 1-inch margins.</p>
+      <h2>Export Instructions</h2>
       <ul>
-        <li>Type continuously to see content flow to the next page.</li>
-        <li>Click the Print icon to export as PDF.</li>
-        <li>Notice that the text wrapping on screen matches the PDF exactly.</li>
+        <li>Click the Print icon.</li>
+        <li>In the printer dialog, ensure <strong>"Margins"</strong> is set to <strong>"Default"</strong> or <strong>"None"</strong> (Our code handles the rest).</li>
+        <li>You will see the text is perfectly aligned 1 inch from the edge.</li>
       </ul>
-      <p>Keep typing...</p>
     `,
     editorProps: {
       attributes: {
@@ -37,19 +35,14 @@ const Editor = () => {
   if (!editor) return null
 
   return (
-    <div className="flex flex-col items-center min-h-screen pb-10 print:block print:pb-0">
+    <div className="flex flex-col items-center min-h-screen pb-10 print:block print:pb-0 print:min-h-0">
       
       <div className="sticky top-6 z-50 mb-6 print:hidden">
         <Toolbar editor={editor} />
       </div>
 
-      {/* SCREEN CONTAINER
-        Width: 816px (8.5 inches @ 96 DPI).
-        This fixed width coupled with the 96px padding in CSS
-        creates a content area of exactly 6.5 inches.
-        
-        This matches the Print View where:
-        8.5in Page - 1in Left Margin - 1in Right Margin = 6.5in Content.
+      {/* SCREEN: Width 816px (8.5in). Padding 96px (1in) comes from .ProseMirror in CSS.
+         PRINT: Width 100%. Margins/Padding are handled by body in CSS.
       */}
       <div 
         className="w-[816px] bg-white print:w-full print:m-0"

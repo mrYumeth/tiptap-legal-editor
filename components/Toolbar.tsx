@@ -8,10 +8,10 @@ import {
   List, 
   ListOrdered, 
   Heading1, 
-  Heading2,
-  Heading3,
+  Heading2, 
+  Heading3, 
   Code,
-  Printer,
+  Printer, // Added Printer icon
 } from 'lucide-react'
 
 type Props = {
@@ -32,7 +32,7 @@ const Toolbar = ({ editor }: Props) => {
   return (
     <div className="border border-gray-200 bg-white rounded-lg shadow-lg p-2 flex flex-wrap gap-1 w-fit">
       
-      {/* Text Formatting */}
+      {/* Formatting Tools */}
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
@@ -117,7 +117,7 @@ const Toolbar = ({ editor }: Props) => {
 
       <div className="w-[1px] bg-gray-300 mx-1" />
       
-      {/* Print Button */}
+      {/* PRINT BUTTON */}
       <button
         onClick={() => window.print()}
         className="p-2 rounded text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors"

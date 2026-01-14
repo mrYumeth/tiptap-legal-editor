@@ -11,10 +11,7 @@ import {
   Heading2,
   Heading3,
   Code,
-  Quote,
   Printer,
-  Undo,
-  Redo,
 } from 'lucide-react'
 
 type Props = {
@@ -35,27 +32,6 @@ const Toolbar = ({ editor }: Props) => {
   return (
     <div className="border border-gray-200 bg-white rounded-lg shadow-lg p-2 flex flex-wrap gap-1 w-fit">
       
-      {/* Undo/Redo */}
-      <button
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().undo()}
-        className={`${buttonClass} text-gray-700 hover:bg-gray-100`}
-        title="Undo"
-      >
-        <Undo size={18} />
-      </button>
-      
-      <button
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().redo()}
-        className={`${buttonClass} text-gray-700 hover:bg-gray-100`}
-        title="Redo"
-      >
-        <Redo size={18} />
-      </button>
-
-      <div className="w-[1px] bg-gray-300 mx-1" />
-
       {/* Text Formatting */}
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -137,14 +113,6 @@ const Toolbar = ({ editor }: Props) => {
         title="Numbered List"
       >
         <ListOrdered size={18} />
-      </button>
-
-      <button
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={`${buttonClass} ${isActive('blockquote')}`}
-        title="Blockquote"
-      >
-        <Quote size={18} />
       </button>
 
       <div className="w-[1px] bg-gray-300 mx-1" />

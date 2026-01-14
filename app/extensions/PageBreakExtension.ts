@@ -1,210 +1,131 @@
-// app/extensions/PageBreakExtension.ts
 import { Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
-interface PageBreakState {
-  decorations: DecorationSet
-}
-
 export const PageBreakExtension = Extension.create({
   name: 'pageBreak',
 
   addProseMirrorPlugins() {
-    const pluginKey = new PluginKey<PageBreakState>('page-break')
-    
-    // US Letter: 8.5" x 11" at 96 DPI
-    // Total height: 11" = 1056px
-    // Margins: 1" top + 1" bottom = 192px
-    // Content area: 864px per page
-    const PAGE_CONTENT_HEIGHT = 864
-    
-    const measureNodeHeight = (node: ProseMirrorNode, view: any, pos: number): number => {
-      try {
-        // Get the actual DOM element for this node
-        const domNode = view.domAtPos(pos)
-        if (domNode && domNode.node) {
-          let element = domNode.node as HTMLElement
-          
-          // If it's a text node, get its parent element
-          if (element.nodeType === Node.TEXT_NODE) {
-            element = element.parentElement as HTMLElement
-          }
-          
-          // If we have an element, measure its actual height
-          if (element && element.getBoundingClientRect) {
-            const rect = element.getBoundingClientRect()
-            // Add some margin for spacing
-            return Math.ceil(rect.height) + 4
-          }
-        }
-      } catch (e) {
-        // Fallback to estimation
-      }
-      
-      // Fallback: Estimate based on content
-      const text = node.textContent
-      const type = node.type.name
-      
-      if (type === 'heading') {
-        const level = node.attrs.level || 1
-        const baseHeight = level === 1 ? 48 : level === 2 ? 40 : 32
-        const lines = Math.ceil(text.length / 60)
-        return baseHeight + (lines - 1) * 24
-      }
-      
-      if (type === 'paragraph') {
-        if (text.length === 0) return 24
-        const lines = Math.ceil(text.length / 85)
-        return lines * 24 + 12
-      }
-      
-      if (type === 'listItem') {
-        if (text.length === 0) return 28
-        const lines = Math.ceil(text.length / 80)
-        return lines * 24 + 4
-      }
-      
-      if (type === 'codeBlock') {
-        const lines = text.split('\n').length
-        return lines * 20 + 24
-      }
-      
-      if (type === 'blockquote') {
-        const lines = Math.ceil(text.length / 75)
-        return lines * 24 + 16
-      }
-      
-      if (type === 'horizontalRule') {
-        return 32
-      }
-      
-      return 24
-    }
-    
-    const calculatePageBreaks = (doc: ProseMirrorNode, view: any): DecorationSet => {
-      const decorations: Decoration[] = []
-      let currentPageHeight = 0
-      let pageNumber = 1
-      let lastBreakPos = 0
-      
-      doc.descendants((node, pos) => {
-        // Only process block-level nodes
-        if (!node.isBlock) return
-        
-        // Skip empty text blocks and list containers
-        if (node.type.name === 'bulletList' || node.type.name === 'orderedList') {
-          return // Continue to process children
-        }
-        
-        // Measure the actual node height
-        const nodeHeight = measureNodeHeight(node, view, pos)
-        
-        // Check if adding this node would overflow the page
-        if (currentPageHeight + nodeHeight > PAGE_CONTENT_HEIGHT && currentPageHeight > 100) {
-          // Only add page break if we're not too close to the last one (avoid consecutive breaks)
-          if (pos - lastBreakPos > 10) {
-            // Create page break decoration
-            const breakWidget = document.createElement('div')
-            breakWidget.className = 'page-break-indicator'
-            breakWidget.contentEditable = 'false'
-            
-            // Create the visual line
-            const line = document.createElement('div')
-            line.className = 'page-break-line'
-            
-            // Create page label
-            const label = document.createElement('div')
-            label.className = 'page-number-label'
-            label.textContent = `Page ${pageNumber + 1}`
-            
-            line.appendChild(label)
-            breakWidget.appendChild(line)
-            
-            decorations.push(
-              Decoration.widget(pos, breakWidget, {
-                side: -1,
-                key: `page-break-${pageNumber}-${pos}`,
-              })
-            )
-            
-            // Reset for new page
-            currentPageHeight = nodeHeight
-            pageNumber++
-            lastBreakPos = pos
-          }
-        } else {
-          currentPageHeight += nodeHeight
-        }
-      })
-      
-      return DecorationSet.create(doc, decorations)
-    }
+    const pluginKey = new PluginKey('page-break')
 
     return [
-      new Plugin<PageBreakState>({
+      new Plugin({
         key: pluginKey,
-        
         state: {
-          init(_, { doc }) {
-            return {
-              decorations: DecorationSet.empty,
-            }
+          init() {
+            return DecorationSet.empty
           },
-          
-          apply(tr, value, oldState, newState) {
-            // Only recalculate if document changed
-            if (!tr.docChanged && !tr.getMeta('forceUpdate')) {
-              return {
-                ...value,
-                decorations: value.decorations.map(tr.mapping, tr.doc),
-              }
+          apply(tr, value) {
+            if (tr.getMeta(pluginKey)) {
+              return tr.getMeta(pluginKey)
             }
-            
-            // Get the editor view from the transaction meta
-            const view = tr.getMeta('view')
-            if (!view) {
-              return value
-            }
-            
-            // Recalculate page breaks with actual measurements
-            return {
-              decorations: calculatePageBreaks(newState.doc, view),
-            }
+            return value.map(tr.mapping, tr.doc)
           },
         },
-
         props: {
           decorations(state) {
-            const pluginState = pluginKey.getState(state)
-            return pluginState?.decorations || DecorationSet.empty
+            return this.getState(state)
           },
+          // Trigger update on paste
+          handlePaste(view) {
+            setTimeout(() => {
+              if (view && !view.isDestroyed) {
+                const tr = view.state.tr
+                tr.setMeta('paste-update', true)
+                view.dispatch(tr)
+              }
+            }, 100)
+            return false
+          }
         },
-        
         view(editorView) {
-          // Initial calculation after a short delay to ensure DOM is ready
-          setTimeout(() => {
-            const tr = editorView.state.tr
-            tr.setMeta('view', editorView)
-            tr.setMeta('forceUpdate', true)
-            editorView.dispatch(tr)
-          }, 100)
-          
+          const updatePageBreaks = (view: any, doc: ProseMirrorNode) => {
+            if (typeof window === 'undefined') return
+
+            const decorations: Decoration[] = []
+            
+            // US Letter Specifications
+            // 11 inches height = 1056px
+            // 1 inch top/bottom margins = 192px total
+            // Content area = 864px
+            const CONTENT_HEIGHT = 864 
+            
+            let currentHeight = 0
+            let pageNumber = 1
+
+            doc.forEach((node, offset) => {
+              let nodeHeight = 0
+              
+              try {
+                const domNode = view.nodeDOM(offset) as HTMLElement
+                if (domNode instanceof HTMLElement) {
+                  // GetBoundingClientRect is more accurate than offsetHeight
+                  const rect = domNode.getBoundingClientRect()
+                  nodeHeight = rect.height
+                  
+                  // Add margin estimation if not captured (ProseMirror blocks usually have margins)
+                  const style = window.getComputedStyle(domNode)
+                  nodeHeight += parseInt(style.marginTop) + parseInt(style.marginBottom)
+                }
+              } catch (e) {
+                // Fallback
+              }
+
+              // Fallback if DOM is not ready
+              if (nodeHeight === 0) {
+                 const textLength = node.textContent.length
+                 nodeHeight = Math.max(24, Math.ceil(textLength / 80) * 24 + 16)
+              }
+
+              if (currentHeight + nodeHeight > CONTENT_HEIGHT) {
+                // Create the widget DOM
+                const breakWidget = document.createElement('div')
+                breakWidget.className = 'page-break-indicator'
+                // CRITICAL: Prevent cursor from entering the widget
+                breakWidget.contentEditable = 'false'
+                
+                breakWidget.innerHTML = `
+                  <div class="page-break-line">
+                    <span class="page-number-label">Page ${pageNumber + 1}</span>
+                  </div>
+                `
+                
+                decorations.push(
+                  Decoration.widget(offset, breakWidget, { 
+                    side: -1,
+                    ignoreSelection: true 
+                  })
+                )
+                
+                currentHeight = nodeHeight
+                pageNumber++
+              } else {
+                currentHeight += nodeHeight
+              }
+            })
+
+            const tr = view.state.tr
+            tr.setMeta(pluginKey, DecorationSet.create(doc, decorations))
+            view.dispatch(tr)
+          }
+
+          // Initial check
+          setTimeout(() => updatePageBreaks(editorView, editorView.state.doc), 100)
+
           return {
             update(view, prevState) {
-              // Recalculate on every update with view info
-              if (view.state.doc !== prevState.doc) {
-                // Use requestAnimationFrame to ensure DOM is updated
+              const isPaste = view.state.tr.getMeta('paste-update')
+              if (!view.state.doc.eq(prevState.doc) || isPaste) {
                 requestAnimationFrame(() => {
-                  const tr = view.state.tr
-                  tr.setMeta('view', view)
-                  view.dispatch(tr)
+                   if (!view.isDestroyed) {
+                     updatePageBreaks(view, view.state.doc)
+                   }
                 })
               }
             }
           }
-        }
+        },
       }),
     ]
   },

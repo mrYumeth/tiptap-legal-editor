@@ -8,79 +8,213 @@ body {
   background-color: #f3f4f6;
 }
 
-/* Force exact sizing so our JS Math matches the Browser Rendering */
-@layer base {
-  p {
-    line-height: 24px !important;
-    margin-bottom: 12px !important;
-  }
-  h1 {
-    line-height: 40px !important;
-    margin-bottom: 24px !important;
-    margin-top: 0 !important;
-  }
-  h2 {
-    line-height: 32px !important;
-    margin-bottom: 16px !important;
-    margin-top: 0 !important;
-  }
+/* ProseMirror Base Styles */
+.ProseMirror {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  color: #000;
 }
 
-/* Page Break Gap Style */
-.page-break-gap {
-  height: 48px;
-  background-color: #f3f4f6;
-  margin-left: -96px;
-  margin-right: -96px;
-  border-top: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
-  position: relative;
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* Typography - Exact measurements for pagination */
+.ProseMirror p {
+  line-height: 24px;
+  margin: 0 0 12px 0;
+  font-size: 12pt;
+}
+
+.ProseMirror h1 {
+  font-size: 2em;
+  line-height: 1.2;
+  font-weight: bold;
+  margin: 0 0 24px 0;
+  color: #111;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  line-height: 1.3;
+  font-weight: bold;
+  margin: 0 0 20px 0;
+  color: #111;
+}
+
+.ProseMirror h3 {
+  font-size: 1.17em;
+  line-height: 1.4;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  color: #111;
+}
+
+/* Lists */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 28px;
+  margin: 0 0 12px 0;
+}
+
+.ProseMirror li {
+  line-height: 24px;
+  margin-bottom: 4px;
+}
+
+.ProseMirror li p {
+  margin: 0;
+}
+
+/* Code blocks */
+.ProseMirror pre {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 0 0 16px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 11pt;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.ProseMirror code {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 11pt;
+}
+
+/* Blockquote */
+.ProseMirror blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 16px;
+  margin: 0 0 16px 0;
+  color: #666;
+  font-style: italic;
+}
+
+/* Horizontal Rule */
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #ddd;
+  margin: 16px 0;
+}
+
+/* Bold and Italic */
+.ProseMirror strong {
+  font-weight: bold;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror u {
+  text-decoration: underline;
+}
+
+.ProseMirror s {
+  text-decoration: line-through;
+}
+
+/* Page Break Visualization */
+.page-break-line {
+  height: 40px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    transparent 45%, 
+    #cbd5e1 45%, 
+    #cbd5e1 50%,
+    transparent 50%,
+    transparent 55%,
+    #cbd5e1 55%,
+    #cbd5e1 60%,
+    transparent 60%,
+    transparent 100%
+  );
+  margin: 0 -96px;
   width: calc(100% + 192px);
-  pointer-events: none;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+  user-select: none;
 }
 
-.page-break-gap::after {
-  content: "Page " attr(data-page);
-  font-size: 12px;
-  color: #9ca3af;
-  font-weight: 500;
+.page-number-label {
+  background: white;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 4px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Print Styles */
 @media print {
   @page {
-    margin: 1in;
     size: letter;
+    margin: 1in;
   }
 
-  /* Reset body background */
-  body {
-    background-color: white !important;
+  * {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  /* Ensure the editor content flows naturally */
-  .ProseMirror {
-    position: static !important;
-    width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
+  body {
+    background: white !important;
+    margin: 0;
+    padding: 0;
   }
 
-  /* Hide the gray page-break markers in print */
-  .page-break-gap {
+  /* Hide page break decorations */
+  .page-break-line,
+  .page-number-label {
     display: none !important;
   }
 
-  /* Prevent awkward splits */
-  p, h1, h2, h3, li {
+  /* Reset editor container for print */
+  .ProseMirror {
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Prevent awkward page breaks */
+  .ProseMirror h1,
+  .ProseMirror h2,
+  .ProseMirror h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .ProseMirror p,
+  .ProseMirror li,
+  .ProseMirror pre,
+  .ProseMirror blockquote {
+    page-break-inside: avoid;
     break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Ensure lists stay together when possible */
+  .ProseMirror ul,
+  .ProseMirror ol {
+    page-break-inside: auto;
   }
 }

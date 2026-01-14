@@ -9,7 +9,12 @@ import {
   ListOrdered, 
   Heading1, 
   Heading2,
-  Printer 
+  Heading3,
+  Code,
+  Quote,
+  Printer,
+  Undo,
+  Redo,
 } from 'lucide-react'
 
 type Props = {
@@ -22,38 +27,70 @@ const Toolbar = ({ editor }: Props) => {
   }
 
   const isActive = (type: string, options?: any) => {
-    return editor.isActive(type, options) ? 'bg-gray-200 text-black' : 'text-gray-600 hover:bg-gray-100'
+    return editor.isActive(type, options) ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
   }
 
-  const buttonClass = "p-2 rounded transition-colors"
+  const buttonClass = "p-2 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
 
   return (
-    <div className="border border-gray-200 bg-white rounded-md mb-6 p-2 flex gap-2 sticky top-4 z-50 shadow-sm w-fit mx-auto">
-      {/* Bold */}
+    <div className="border border-gray-200 bg-white rounded-lg shadow-lg p-2 flex flex-wrap gap-1 w-fit">
+      
+      {/* Undo/Redo */}
+      <button
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().undo()}
+        className={`${buttonClass} text-gray-700 hover:bg-gray-100`}
+        title="Undo"
+      >
+        <Undo size={18} />
+      </button>
+      
+      <button
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().redo()}
+        className={`${buttonClass} text-gray-700 hover:bg-gray-100`}
+        title="Redo"
+      >
+        <Redo size={18} />
+      </button>
+
+      <div className="w-[1px] bg-gray-300 mx-1" />
+
+      {/* Text Formatting */}
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={`${buttonClass} ${isActive('bold')}`}
+        title="Bold (Ctrl+B)"
       >
-        <Bold size={20} />
+        <Bold size={18} />
       </button>
       
-      {/* Italic */}
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={`${buttonClass} ${isActive('italic')}`}
+        title="Italic (Ctrl+I)"
       >
-        <Italic size={20} />
+        <Italic size={18} />
       </button>
 
-      {/* Strikethrough */}
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
         className={`${buttonClass} ${isActive('strike')}`}
+        title="Strikethrough"
       >
-        <Strikethrough size={20} />
+        <Strikethrough size={18} />
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleCode().run()}
+        disabled={!editor.can().chain().focus().toggleCode().run()}
+        className={`${buttonClass} ${isActive('code')}`}
+        title="Inline Code"
+      >
+        <Code size={18} />
       </button>
 
       <div className="w-[1px] bg-gray-300 mx-1" />
@@ -62,15 +99,25 @@ const Toolbar = ({ editor }: Props) => {
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={`${buttonClass} ${isActive('heading', { level: 1 })}`}
+        title="Heading 1"
       >
-        <Heading1 size={20} />
+        <Heading1 size={18} />
       </button>
 
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={`${buttonClass} ${isActive('heading', { level: 2 })}`}
+        title="Heading 2"
       >
-        <Heading2 size={20} />
+        <Heading2 size={18} />
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        className={`${buttonClass} ${isActive('heading', { level: 3 })}`}
+        title="Heading 3"
+      >
+        <Heading3 size={18} />
       </button>
 
       <div className="w-[1px] bg-gray-300 mx-1" />
@@ -79,27 +126,37 @@ const Toolbar = ({ editor }: Props) => {
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={`${buttonClass} ${isActive('bulletList')}`}
+        title="Bullet List"
       >
-        <List size={20} />
+        <List size={18} />
       </button>
       
       <button
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         className={`${buttonClass} ${isActive('orderedList')}`}
+        title="Numbered List"
       >
-        <ListOrdered size={20} />
+        <ListOrdered size={18} />
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        className={`${buttonClass} ${isActive('blockquote')}`}
+        title="Blockquote"
+      >
+        <Quote size={18} />
       </button>
 
       <div className="w-[1px] bg-gray-300 mx-1" />
       
-    {/* PRINT BUTTON */}
-    <button
+      {/* Print Button */}
+      <button
         onClick={() => window.print()}
-        className="p-2 rounded text-gray-600 hover:bg-gray-100 hover:text-blue-600 transition-colors"
-        title="Print Document"
-    >
-        <Printer size={20} />
-    </button>
+        className="p-2 rounded text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+        title="Print Document (Ctrl+P)"
+      >
+        <Printer size={18} />
+      </button>
     </div>
   )
 }

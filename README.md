@@ -1,53 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Legal Document Editor (Tip-tap + Next.js)
 
-## Getting Started
+A WYSIWYG editor designed for legal document drafting with real-time, print-accurate pagination. Built with **Next.js 14**, **Tiptap**, and **Tailwind CSS**.
 
-First, run the development server:
+**Live Demo:** [Deployed on Vercel](https://tiptap-legal-editor-fzmszvsa7-mryumeths-projects.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Real-time Pagination:** Visualizes page breaks as you type, matching US Letter standards (8.5" x 11").
+- **WYSIWYG Printing:** The editor output matches the browser's PDF export exactly (1-inch margins).
+- **Automatic Page Numbering:** Dynamic page numbers appear at the bottom of every page.
+- **Smart Reflow:** Content automatically flows to the next page when editing or pasting text.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
+- **Editor:** [Tiptap](https://tiptap.dev/) (Headless wrapper for ProseMirror)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) + `@tailwindcss/typography`
+- **Deployment:** [Vercel](https://vercel.com)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ⚙️ Setup Instructions
 
-## Deploy on Vercel
+1. **Clone the repository:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-# Legal Document Editor (Tiptap + Next.js)
-
-A WYSIWYG editor focused on real-time pagination for legal documents.
-
-## Tech Stack
-
-- **Framework:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS
-- **Editor:** Tiptap (Headless wrapper for ProseMirror)
-
-## Setup Instructions
-
-1. Clone the repository:
    ```bash
    git clone [https://github.com/mrYumeth/tiptap-legal-editor.git](https://github.com/mrYumeth/tiptap-legal-editor.git)
+   cd tiptap-legal-editor
+
    ```
+
+2. **Install dependencies:**
+   npm install
+
+   # or
+
+   yarn install
+
+3. **Run the development server:**
+   npm run dev
+
+🧠 **Technical Approach to Pagination**
+Achieving real-time pagination in a web editor is challenging because the DOM (Document Object Model) does not inherently have a concept of "pages." Here is how we solved it:
+
+1. **DOM-Based Measurement**
+   Instead of estimating height based on character count, we measure the actual rendered height of every top-level block (paragraphs, headings) using getBoundingClientRect(). This ensures that font styles, line wrapping, and margins are accurately accounted for.
+
+2. **ProseMirror Plugin**
+   We implemented a custom Tiptap extension (PageBreakExtension.ts) that runs a ProseMirror Plugin.
+
+View Layer Logic: The plugin iterates through the document's nodes.
+
+Accumulation: It accumulates the height of each node against a fixed "Content Height" (864px for US Letter with 1" margins).
+
+Decoration Widgets: When a node exceeds the page boundary, we insert a Decoration Widget (a visual "Page Break" div) into the editor view without altering the actual document content.
+
+3. **Print Simulation**
+   To ensure WYSIWYG (What You Get Is What You See), we use strict CSS rules:
+
+Screen: The editor container is fixed to 816px (8.5 inches) with 96px (1 inch) padding.
+
+Print: We use @media print to force the browser margins to zero and apply a physical 1in padding to the body. This prevents the browser's default printer settings from shifting the layout.
+
+⚖️ **Trade-offs & Limitations**
+
+1. Block-Level Pagination: Currently, the system pushes an entire block (e.g., a paragraph) to the next page if it doesn't fit. It does not yet "split" a single text node across two pages (e.g., half a paragraph on Page 1, half on Page 2).
+
+2. Performance: Measuring DOM nodes on every keystroke can be expensive. We mitigated this using requestAnimationFrame and debouncing, but extremely large documents (100+ pages) might see performance impacts.
+
+3. Browser Dependency: Layouts rely on the browser's rendering engine. Minor differences in font rendering between browsers (Chrome vs. Firefox) could theoretically shift a line break, though our fixed-width approach minimizes this.
+
+🚀 **Future Improvements**
+With more time, I would prioritize the following enhancements:
+
+1. Header & Footer Support: Implement editable headers and footers that repeat on every page (or specific pages).
+
+2. Table Support: Add a Tiptap Table extension with logic to handle row-breaking across pages gracefully.
+
+3. Better Page Break Handling: Implement logic to split long text blocks (paragraphs) into two separate nodes so text can flow continuously across pages rather than pushing the whole block.
+
+4. Advanced Page Layouts: Support for different page sizes (A4, Legal) and custom margin configurations.

@@ -11,7 +11,7 @@ import {
   Heading2, 
   Heading3, 
   Code,
-  Printer, // Added Printer icon
+  Printer, 
 } from 'lucide-react'
 
 type Props = {

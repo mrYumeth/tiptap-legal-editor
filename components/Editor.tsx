@@ -22,8 +22,7 @@ const Editor = () => {
         <li><strong>Page 1:</strong> Starts 1 inch from the top.</li>
         <li><strong>Page 2+:</strong> Automatically calculates breaks and adds a 1-inch top margin spacer.</li>
         <li><strong>Bottom:</strong> Text stops exactly 1 inch from the bottom edge.</li>
-      </ul>
-      <p>Keep typing to test the multi-page layout...</p>
+      </ul>      
     `,
     editorProps: {
       attributes: {
